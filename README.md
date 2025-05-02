@@ -1,106 +1,113 @@
 # End-to-End Test
 
-Цей репозиторій містить автоматизований тест для CRM системи з використанням фреймворку [Playwright](https://playwright.dev/).
+This repository contains automated tests for a CRM system using the [Playwright](https://playwright.dev/) framework.
 
-## Структура проекту
+## Project Structure
 
 ```
 .
 ├── config/
-│   └── playwright.config.js    # Конфігурація Playwright
+│   └── playwright.config.js    # Playwright configuration
 ├── fixtures/
-│   ├── login-data.js       # Тестові дані для авторизації
-│   └── test-data.js        # Загальні тестові дані
+│   ├── login-data.js       # Test data for authorization
+│   └── test-data.js        # General test data
 ├── page-objects/
-│   ├── ChatPage.js         # Об'єкт сторінки чату
-│   ├── LoginPage.js        # Об'єкт сторінки логіну
-│   └── SettingsPage.js     # Об'єкт сторінки налаштувань
+│   ├── ChatPage.js         # Chat page object
+│   ├── LoginPage.js        # Login page object
+│   └── SettingsPage.js     # Settings page object
 ├── tests/
-│   └── verify-script-group-functionality.spec.js  # Специфікація тесту
-├── package.json            # Залежності та скрипти проекту
-└── package-lock.json       # Фіксація версій залежностей
+│   └── verify-script-group-functionality.spec.js  # Test specification
+├── README.md               # Project documentation
+├── package.json            # Project dependencies and scripts
+└── package-lock.json       # Dependency version lock
 ```
 
-## Налаштування
+## Setup
 
-Проект використовує Playwright для автоматизації тестування веб-додатку. Конфігурація знаходиться в файлі `config/playwright.config.js` і налаштована для запуску тестів на трьох основних браузерах:
+The project uses Playwright for web application test automation. Configuration is located in the `config/playwright.config.js` file and is set up to run tests on three major browsers:
 - Chromium
 - Firefox
 - Safari (WebKit)
 
-### Параметри конфігурації:
+### Configuration Parameters:
 
 - **Base URL**: `https://stage-astrocrm.obrio.net`
-- **Таймаути**:
-  - Action timeout: 15 секунд
-  - Navigation timeout: 30 секунд
-  - Загальний таймаут тесту: 60 секунд
-- **Скріншоти**: Зберігаються лише при падінні тесту
-- **Відео**: Записується при першій невдалій спробі
-- **Трасування**: Збирається при першій невдалій спробі
+- **Timeouts**:
+  - Action timeout: 15 seconds
+  - Navigation timeout: 30 seconds
+  - Overall test timeout: 60 seconds
+- **Screenshots**: Saved only when test fails
+- **Video**: Recorded on first failed attempt
+- **Tracing**: Collected on first failed attempt
 
 ## Page Objects
 
-Проект використовує патерн Page Object для організації коду взаємодії зі сторінками:
+The project uses the Page Object pattern for organizing code that interacts with pages:
 
 ### LoginPage
 
-Клас для взаємодії зі сторінкою логіну, містить методи:
-- `goto()` - перехід на сторінку логіну
-- `login(username, password)` - авторизація користувача
+Class for interacting with the login page, contains methods:
+- `goto()` - navigate to login page
+- `login(username, password)` - user authorization
 
 ### ChatPage
 
-Клас для взаємодії з чатом, містить методи:
-- `openFirstChat()` - відкриття першого чату зі списку
+Class for interacting with the chat, contains methods:
+- `openFirstChat()` - opening the first chat from the list
 
 ### SettingsPage
 
-Клас для взаємодії з налаштуваннями, містить методи:
-- `navigateToSettings()` - перехід до сторінки налаштувань
-- `createNewGroup()` - створення нової групи скриптів
-- `deleteGroup()` - видалення групи скриптів
-- `confirmDelete()` - підтвердження видалення
+Class for interacting with settings, contains methods:
+- `navigateToSettings()` - navigate to settings page
+- `createNewGroup()` - create a new script group
+- `deleteGroup()` - delete a script group
+- `confirmDelete()` - confirm deletion
 
-## Тестові кейси
+## Test Cases
 
 ### verify-script-group-functionality.spec.js
 
-Цей тест перевіряє функціональність груп скриптів (Script Groups):
+This test verifies script group functionality:
 
-1. Логін під валідним користувачем
-2. Перехід до налаштувань
-3. Створення нової групи скриптів
-4. Перевірка відображення сповіщення про успішне створення
-5. Перехід до чату
-6. Відкриття першого чату
-7. Перевірка наявності нової групи скриптів в інтерфейсі чату
+1. Login with a valid user
+2. Navigate to settings
+3. Create a new script group
+4. Verify that a success notification is displayed
+5. Navigate to chat
+6. Open the first chat
+7. Verify that the new script group appears in the chat interface
 
-Після проходження тесту виконується очистка тестових даних (видалення створеної групи скриптів).
+After the test completes, test data is cleaned up (created script group is deleted).
 
-## Тестові дані
+## Test Data
 
 ### login-data.js
 
-Містить дані для авторизації:
-- Валідний користувач: `test@gmail.com`
+Contains authorization data:
+- Valid user: `test@gmail.com`
 
 ### test-data.js
 
-Містить загальні тестові дані:
-- Назва тестової групи: `Test Group`
-- Текст скрипту: `test script`
+Contains general test data:
+- Test group name: `Test Group`
+- Script text: `test script`
 
-# Запуск тестів у конкретному браузері
+## Running Tests
+
+```bash
+# Run tests in all browsers
+npx playwright test
+
+# Run tests in a specific browser
 npx playwright test --project=chromium
 
-# Запуск в режимі debug
+# Run in debug mode
 npx playwright test --debug
 ```
 
-## Звіти
+## Reports
 
-Звіти генеруються в HTML форматі. Після запуску тестів можна переглянути звіт:
+Reports are generated in HTML format. After running the tests, you can view the report:
 
 ```bash
 npx playwright show-report
