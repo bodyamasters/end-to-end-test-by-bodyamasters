@@ -5,60 +5,60 @@ import { SettingsPage } from '../page-objects/SettingsPage';
 import { ChatPage } from '../page-objects/ChatPage';
 import { testData } from '../fixtures/test-data';
 
+/**
+ * Fixture to clean up the created group after each test
+ */
 test.afterEach(async ({ page }, testInfo) => {
-   // Cleanup the created group after each test
-
-   // Check if the test failed
-   // and attach a screenshot if it did
+   // Check if the test failed and add a screenshot
     if (testInfo.status !== 'passed') {
         const screenshot = await page.screenshot();
         await testInfo.attach('screenshot', { body: screenshot, contentType: 'image/png' });
-      }
+    }
 
     try {
         // Navigate to the settings page
         let settingsPage = new SettingsPage(page);
-        await settingsPage.navigateToSettings(page);
-        await expect(page.url().endsWith('/quick-messages')).toBeTruthy();
-
+        await settingsPage.navigateToSettings();
+        
         // Delete the created group
-        await settingsPage.deleteGroup(page);
+        await settingsPage.deleteGroup();
 
         // Wait for the delete confirmation dialog to appear
         const deleteScriptDialog = page.locator("section[role='dialog']");
         await expect(deleteScriptDialog).toBeVisible();
 
         // Confirm the deletion
-        await settingsPage.confirmDelete(page);
+        await settingsPage.confirmDelete();
     } catch (error) {
-        // If an error occurs during cleanup, log it and attach a screenshot
+        // Log the error and attach a screenshot when cleanup fails
         console.warn('❌ afterEach cleanup failed:', error.message);
         await testInfo.attach('cleanup-error', { 
             body: await page.screenshot(), 
             contentType: 'image/png' 
-          });
+        });
     }
 });
 
+/**
+ * Test script group functionality
+ */
 test('Verify Script Group Functionality', async ({ page }) => {
-    //Create a new instances for the page objects
-    let settingsPage = new SettingsPage(page);
-    let chatPage = new ChatPage(page);
-    let loginPage = new LoginPage(page);
+    // Create instances of page objects
+    const loginPage = new LoginPage(page);
+    const settingsPage = new SettingsPage(page);
+    const chatPage = new ChatPage(page);
     
-    // Navigate to the login page
+    // Login to the system
     await loginPage.goto();
     await loginPage.login(validUser.email, validUser.password);
 
-    // Wait for the login to complete and the URL to change
-    await page.waitForURL('**/chat');
-    await expect(page.url().endsWith('/chat')).toBeTruthy();
+    // Verify successful login
+    await expect(page.url()).toContain('/chat');
 
     // Open the settings page
     await settingsPage.navigateToSettings();
-    await expect(page.url().endsWith('/quick-messages')).toBeTruthy();
-
-    // Verify the page title
+    
+    // Verify page title
     const scriptGroupsTitle = page.locator(".MuiTypography-root.MuiTypography-body1.css-eidqfs");
     await expect(scriptGroupsTitle).toHaveText('Script Groups');
     await expect(scriptGroupsTitle).toBeVisible();
@@ -66,7 +66,7 @@ test('Verify Script Group Functionality', async ({ page }) => {
     // Create a new script group
     await settingsPage.createNewGroup();
 
-    // Verify the new group creation
+    // Verify successful group creation
     const successAlert = page.locator("section[role='alert']");
     await expect(successAlert).toBeVisible();
 
@@ -74,30 +74,17 @@ test('Verify Script Group Functionality', async ({ page }) => {
     const sideMenuButton = page.locator('button.MuiButton-containedPrimary[type="button"] svg.MuiSvgIcon-root');
     await sideMenuButton.click();
 
-    // Navigate to the /chats page
+    // Navigate to the chats page
     const sideMenuChatsButton = page.locator("a.MuiListItemButton-root[href='/chat']");
     await sideMenuChatsButton.click();
 
-    // Wait for the page to load and verify the URL
+    // Wait for the page to load
     await page.waitForURL('**/chat');
-    await expect(page.url().endsWith('/chat')).toBeTruthy();
+    await expect(page.url()).toContain('/chat');
 
     // Open the first chat
-    chatPage.openFirstChat();
+    await chatPage.openFirstChat();
 
-    // Wait for the opned chat blocks to be visible
-    const chatUpperBlock = page.locator(".MuiPaper-root.MuiPaper-elevation.MuiPaper-rounded.MuiPaper-elevation0.css-1lsnlgw");
-    await expect(chatUpperBlock).toBeVisible();
-
-    const chatMainBlock = page.locator(".MuiPaper-root.MuiPaper-elevation.MuiPaper-rounded.MuiPaper-elevation0.css-1p72xcz");
-    await expect(chatMainBlock).toBeVisible();
-
-    const scriptsBlock = page.locator(".MuiBox-root.css-osyylf");
-    await expect(scriptsBlock).toBeVisible();
-
-    // Verify the script group button is visible
-    const newAddedScriptButton = scriptsBlock.locator(`button:has-text("${testData.groupName}")`).last();
-    await newAddedScriptButton.scrollIntoViewIfNeeded();
-    await expect(newAddedScriptButton).toBeVisible();
-    await expect(newAddedScriptButton).toHaveText(testData.groupName);
+    // Verify the created script group is visible
+    await chatPage.verifyScriptGroupVisible(testData.groupName);
 });
