@@ -3,6 +3,7 @@ import { expect } from '@playwright/test';
 
 
 export class SettingsPage {
+  // This class contains methods to interact with the settings page of the application
     constructor(page) {
       this.page = page;
       this.addGroupButton = page.locator('[data-testid="AddIcon"]');
@@ -17,7 +18,7 @@ export class SettingsPage {
 
 
     }
-  
+  // Method to navigate to the settings page
     async navigateToSettings() {
         const moreSettingsButton = this.page.locator('button:has(svg[data-testid="KeyboardArrowDownIcon"])');
         await expect(moreSettingsButton).toBeVisible();
@@ -30,6 +31,7 @@ export class SettingsPage {
         await this.page.waitForURL('**/quick-messages');
       }
 
+    // Method to create a new script group
     async createNewGroup() {
         await expect(this.addGroupButton).toBeVisible();
         await this.addGroupButton.click();
@@ -50,6 +52,7 @@ export class SettingsPage {
         await this.saveButton.click();
     
       }
+      // Method to delete the script group
     async deleteGroup() {
         await expect(this.groupItem).toBeVisible();
     
@@ -59,6 +62,8 @@ export class SettingsPage {
         await expect(this.deleteButton).toBeVisible();
         await this.deleteButton.click();
       }
+
+      // Method to confirm the deletion of the script group
     async confirmDelete() {
       await expect(this.deleteButtonDialog).toBeVisible();
       await this.deleteButtonDialog.click();
