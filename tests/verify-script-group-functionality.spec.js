@@ -8,7 +8,7 @@ import { testData } from '../fixtures/test-data';
 /**
  * Fixture to clean up the created group after each test
  */
-test.afterEach(async ({ page }, testInfo) => {
+test.afterAll(async ({ page }, testInfo) => {
    // Check if the test failed and add a screenshot
     if (testInfo.status !== 'passed') {
         const screenshot = await page.screenshot();
